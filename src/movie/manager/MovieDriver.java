@@ -161,12 +161,25 @@ public class MovieDriver
 	 */
 	public static void inputTwo()
 	{
-		
-		
-			for(int i=0; i<movie.length; i++)
+		 try 
+		 {
+			
+			scanner = new Scanner(new FileInputStream("movies.txt"));
+			
+			while(scanner.hasNext())
 			{
-			System.out.println(movie[i].getMovieName() + " (" + movie[i].getYear() + ", " + movie[i].getLength() + ") ");
+				String movieLine = scanner.nextLine();
+				String[] movieParts = movieLine.split(", ");
+				System.out.println(movieParts[0] + " (" + movieParts[1] + 
+						", " + movieParts[3]+ ") ");
 			}
+		 }
+		 catch(IOException | NullPointerException ex)
+		 {
+			 	System.out.println("No File found!");
+				ex.printStackTrace();
+				inputReader();
+		 }
 		
 	}
 	
