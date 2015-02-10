@@ -101,18 +101,26 @@ public class MovieDriver
 			console.nextLine();
 			
 			actorArray = new String[actorAmount];
+			
 			for(int j=0; j<actorAmount; j++)
 			{
 				/*Tell the user to pick a selection between 1-4*/
 				System.out.println("Please enter the movie actors: ");
 				actorArray[j] = console.nextLine(); //clears the prompt (to skip enter key)
 				
-				String[] actorDash = new String[actorAmount];
-				actorDash[j] = " -- ";
-				
-				for(int k=0; k<actorAmount; k++)
+			}
+
+			String actors = "";
+			
+			for(int k=0; k<actorAmount; k++)
+			{
+				if(k<actorAmount-1)
 				{
-					actors = new String(actorArray[k]+actorDash[k]);
+					actors += actorArray[k] + " -- ";
+				}
+				else
+				{
+					actors += actorArray[k];
 				}
 			}
 			
