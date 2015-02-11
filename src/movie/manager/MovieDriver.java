@@ -14,12 +14,12 @@ public class MovieDriver
 {
 	/*Variables for the program.*/
 	private static final Scanner console = new Scanner(System.in);
-	private static Movie[] movie;
+	private static Movie[] movieArray;
 	private static String[] actorArray;
-	private static String actors;
 	public static Scanner scanner;
 	public static PrintWriter writer;
 	private static String content = null;
+	private static String actors = "";
 	
 	public static void main(String[] args)
 	{
@@ -47,19 +47,10 @@ public class MovieDriver
 		inputReader();
 		
 	}
-	
-	public static void clearConsole()
-	{
-		for (int i=0;i<50;i++) 
-		{
-			System.out.println();
-		}
-	}
-	
 	/**
 	 * Input One (when the user hits 1)
 	 * @description When 1 is pressed the program will enter
-	 * into the inputOne method and print out the contacts in the array
+	 * into the inputOne method and print the movies into a file.
 	 */
 	public static void inputOne()
 	{
@@ -68,39 +59,44 @@ public class MovieDriver
 		int movieAmount = console.nextInt(); //clears the prompt (to skip enter key)
 		console.nextLine();
 		
-		movie = new Movie[movieAmount];
+		/*Create a new movie array based upon the amount the user inputs*/
+		movieArray = new Movie[movieAmount];
 		
+		/*Loop over creating movie objects for the X amount of times
+		 * the user specifies in the movieAmount Variable*/
 		for(int i=0; i<movieAmount; i++)
 		{
 		
-			/*Tell the user to pick a selection between 1-4*/
+			/*Tell the user to enter the movie name*/
 			System.out.println("Please enter the movie name: ");
 			String movieName = console.nextLine(); //clears the prompt (to skip enter key)
 			
-			/*Tell the user to pick a selection between 1-4*/
+			/*Tell the user to enter the year of the movie*/
 			System.out.println("Please enter the year of the movie: ");
 			int year = console.nextInt(); //clears the prompt (to skip enter key)
 			console.nextLine();
 			
-			/*Tell the user to pick a selection between 1-4*/
+			/*Tell the user to enter the movie rating*/
 			System.out.println("Please enter the movie rating (R,PG, PG-13): ");
 			String mpaaRating = console.nextLine(); //clears the prompt (to skip enter key)
 			
-			/*Tell the user to pick a selection between 1-4*/
+			/*Tell the user to enter a movie length*/
 			System.out.println("Please enter the movie length in minutes (105): ");
 			int length = console.nextInt(); //clears the prompt (to skip enter key)
 			console.nextLine();
 			
-			/*Tell the user to pick a selection between 1-4*/
+			/*Tell the user to enter a movie director*/
 			System.out.println("Please enter the movie director: ");
 			String director = console.nextLine(); //clears the prompt (to skip enter key)
 			
-			/*Tell the user to pick a selection between 1-4*/
+			/*Tell the user to enter the amount of actors*/
 			System.out.println("Please enter the amount of actors: ");
 			int actorAmount = console.nextInt(); //clears the prompt (to skip enter key)
 			console.nextLine();
 			
+			/*Create a new actor array based upon the amount the user inputs*/
 			actorArray = new String[actorAmount];
+			
 			
 			for(int j=0; j<actorAmount; j++)
 			{
@@ -110,50 +106,64 @@ public class MovieDriver
 				
 			}
 
-			String actors = "";
-			
+			/*Loop over creating actor objects for the X amount of times
+			 * the user specifies in the actorAmount Variable*/
 			for(int k=0; k<actorAmount; k++)
 			{
+				/*Checks to see if the actorAmount is the last one or not*/
 				if(k<actorAmount-1)
 				{
 					actors += actorArray[k] + " -- ";
 				}
+				/*If its the last one don't add the dash to it.*/
 				else
 				{
 					actors += actorArray[k];
 				}
 			}
 			
-			
+			/*Try to create a movie Object from the values provided by the user*/
 			try
 			{
-				movie[i] = new Movie(movieName, year, mpaaRating, length, director, actors);
+				movieArray[i] = new Movie(movieName, year, mpaaRating, length, director, actors);
 			}
-			catch(IllegalStateException ex)
+			
+			/*Try to catch a bad varibile passed in by the user causing 
+			 *the arrays to crash or the movie object to fail to be created*/
+			catch(IllegalStateException | NullPointerException ex)
 			{
 				System.out.println(ex.getMessage());
 				System.out.println("An invald varibile has been inputed, Try again!");
+				
+				/*Repeat The method again for the correct variables*/
 				inputOne();
 			}
 		}
 		
-		for(int i=0; i<movie.length; i++)
+		
+		for(int i=0; i<movieArray.length; i++)
 		{
-			//System.out.println(movie[i].toString());
+			/*Try to create a movie.txt in the project folder */
 			try
 			{
-				
+				/*If the file is already made append the file*/
 				if(Files.exists(Paths.get("movies.txt")))
 				{
-					Files.write(Paths.get("movies.txt"), movie[i].printCSV().getBytes(), StandardOpenOption.APPEND);
+					Files.write(Paths.get("movies.txt"), movieArray[i].printCSV().getBytes(), StandardOpenOption.APPEND);
 				}
+				
+				/*If the movies.txt is not present create the file*/
 				else
 				{
-					Files.write(Paths.get("movies.txt"), movie[i].printCSV().getBytes(), StandardOpenOption.CREATE);
+					Files.write(Paths.get("movies.txt"), movieArray[i].printCSV().getBytes(), StandardOpenOption.CREATE);
 				}
-			} catch (IOException | NullPointerException ex)
+			}
+			
+			/*Try to catch a exception if the files is 
+			 *unable to be made or a array error happens*/
+			catch (IOException | NullPointerException ex)
 			{
-				// TODO Auto-generated catch block
+				System.out.println("Movies.txt has a problem being created or writen to.");
 				ex.printStackTrace();
 			}
 		}
@@ -171,17 +181,26 @@ public class MovieDriver
 	{
 		 try 
 		 {
-			
+			/*Read the file content into a new scanner object*/
 			scanner = new Scanner(new FileInputStream("movies.txt"));
 			
+			/*Loop over the content until there is no lines left*/
 			while(scanner.hasNext())
 			{
+				/*Store each line of the content in movieLine*/
 				String movieLine = scanner.nextLine();
+				
+				/*Split the line into parts for the data to be anylazed based upon ", " */
 				String[] movieParts = movieLine.split(", ");
+				
+				/*Print the movie's out line by line with just the movie title, length,year*/
 				System.out.println(movieParts[0] + " (" + movieParts[1] + 
-						", " + movieParts[3]+ ") ");
+						", " + movieParts[3]+ "minutes ) ");
 			}
 		 }
+		 
+			/*Try to catch a exception if the files is 
+			 *unable to be opened or a scanner error happens*/
 		 catch(IOException | NullPointerException ex)
 		 {
 			 	System.out.println("No File found!");
@@ -208,7 +227,7 @@ public class MovieDriver
 			System.out.println("1. Year: ");
 			System.out.println("2. Rating: ");
 			
-			/*Tell the user to pick a selection between 1-4*/
+			/*Tell the user to pick a selection between 1-2*/
 			System.out.println("Please pick a selection: ");
 			int selection = console.nextInt(); 
 			console.nextLine(); //clears the prompt (to skip enter key)
@@ -216,20 +235,25 @@ public class MovieDriver
 			/*If user enters 1 enter this section*/
 			if(selection == 1)
 			{
-				/*Tell the user to pick a selection between 1-4*/
+				/*Tell the user to enter a Year to find*/
 				System.out.println("Please enter the year to find in the list: ");
-				String yearSearch = console.nextLine(); 
-				//console.nextLine(); //clears the prompt (to skip enter key)
+				String yearSearch = console.nextLine();
+				System.out.println();
 				
+				/*Loop until the scanner has run out of lines*/
 				while(scanner.hasNextLine())
 				{
-						
+					/*read the content line by line*/
 					content = scanner.nextLine();
-						
 					
-					if(content.contains(yearSearch))
+					/*Split the movie lines based upon the split Point ", "*/
+					String[] movieParts = content.split(", ");
+					
+					/*If the movie equals the year, print the movie*/
+					if(movieParts[1].equalsIgnoreCase(yearSearch))
 					{
-						System.out.println("WORKED!");
+						System.out.println(movieParts[0] + " (" + movieParts[1] + 
+								", " + movieParts[3]+ " minutes ) ");
 					}
 				}
 			}
@@ -237,24 +261,39 @@ public class MovieDriver
 			/*If user enters 2 enter this section*/
 			else if(selection == 2)
 			{
-				/*Tell the user to pick a selection between 1-4*/
-				System.out.println("Please enter the name to find in the list: ");
-				String ratingSearch = console.nextLine(); //clears the prompt (to skip enter key)
-			}
-			
-			/*Anything else other then 1-4 will go down here*/ 
-			else
-			{
-				/*Tell the user to please enter a number between 1-4 and loop the code*/
-				System.out.println("Not a valid selection please enter a number between 1-2");
-				inputThree();
+				/*Tell the user to enter a Rating to find*/
+				System.out.println("Please enter the Rating to find in the list: ");
+				String ratingSearch = console.nextLine(); 
+				System.out.println();
+				
+				/*Loop until the scanner has run out of lines*/
+				while(scanner.hasNextLine())
+				{
+					/*read the content line by line*/
+					content = scanner.nextLine();
+					
+					/*Split the movie lines based upon the split Point ", "*/
+					String[] movieParts = content.split(", ");
+					
+					/*If the movie equals the rating, print the movie*/
+					if(movieParts[2].equalsIgnoreCase(ratingSearch))
+					{
+						System.out.println(movieParts[0] + " (" + movieParts[1] + 
+								", " + movieParts[3]+ " minutes ) ");
+					}
+				}
 			}
 		} 
-		catch (IOException e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		 
+		 /*Try to catch a exception if the files is 
+		 *unable to be opened or a scanner error happens*/
+		 catch(IOException | NullPointerException ex)
+		 {
+			System.out.println("Invalid search or File opening error!");
+			ex.printStackTrace();
+		 }
+		 
+		 /*Finally close the scanner and writer.*/
 		 finally
 		 {
 			 if(writer !=null)
@@ -300,8 +339,7 @@ public class MovieDriver
 		System.out.println("Please enter a selection: ");
 		int selection = console.nextInt(); //clears the prompt (to skip enter key)
 		console.nextLine();
-		clearConsole();
-		
+
 		/*If user enters 1 enter this section*/
 		if(selection == 1)
 		{
